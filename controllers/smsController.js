@@ -14,12 +14,13 @@ const db = getFirestore(app);
 // service receive SMS
 const receiveSMS = async (req, res, next) => {
   try {
-    const reqBody = req.body;
-    // const otp = Math.floor(100000 + Math.random() * 900000);
+    const msgBody = req.body.Body;
+    console.log("Body: ", msgBody);
+    // conconst otp = Math.floor(100000 + Math.random() * 900000);
     const userRef = doc(db, "users", "+84983264835");
     const data = {
       phoneNumber: "+84983264835",
-      accessCode: reqBody,
+      accessCode: msgBody,
       favoriteGithubUsers: [],
     };
 
@@ -27,7 +28,7 @@ const receiveSMS = async (req, res, next) => {
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       await updateDoc(userRef, {
-        accessCode: reqBody,
+        accessCode: msgBody,
       });
       // res.status(200).send(`Record saved successfuly! AccessCode: ${otp}`);
     } else {
@@ -38,8 +39,8 @@ const receiveSMS = async (req, res, next) => {
     // send opt via twilio
     client.messages
       .create({
-        body: `SKIPLI app - Your Access Code: ${reqBody}`,
-        from: "+12624255115",
+        body: `Jackie Trang: ${msgBody.toString()}`,
+        from: "+13613145274",
         to: "+84983264835",
       })
       .then((messages) => console.log(messages))
@@ -47,7 +48,28 @@ const receiveSMS = async (req, res, next) => {
 
     res.status(200).json({
       code: "2200",
-      message: "Validate successfuly!",
+      message: "Receive SMS!",
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
+const sendSMS = async (req, res, next) => {
+  try {
+    // send opt via twilio
+    client.messages
+      .create({
+        body: `Jackie Trang 1`,
+        from: "+13613145274",
+        to: "+15877054890",
+      })
+      .then((messages) => console.log(messages))
+      .catch((err) => console.error(err));
+
+    res.status(200).json({
+      code: "2200",
+      message: "Send SMS done!",
     });
   } catch (error) {
     res.status(400).send(error.message);
@@ -55,5 +77,5 @@ const receiveSMS = async (req, res, next) => {
 };
 
 module.exports = {
-  receiveSMS,
+  receiveSMS, sendSMS
 };
